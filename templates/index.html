@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Charge Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Predict Your Insurance Charge</h1>
+        <form action="/predict" method="POST">
+            <label for="model_choice">Choose Model:</label>
+            <select name="model_choice" id="model_choice" required>
+                <option value="mlp" {% if model_choice == 'mlp' %}selected{% endif %}>MLP Model</option>
+                <option value="ridge" {% if model_choice == 'ridge' %}selected{% endif %}>Ridge Regression</option>
+                <option value="lr" {% if model_choice == 'lr' %}selected{% endif %}>Linear Regression</option>
+                <option value="stacking" {% if model_choice == 'stacking' %}selected{% endif %}>Stacking Model</option> <!-- Thêm dòng này -->
+            </select><br>
+
+            <label for="age">Age:</label>
+            <input type="number" step="0.1" name="age" id="age" value="{{ age }}" required><br>
+
+            <label for="bmi">BMI:</label>
+            <input type="number" step="0.1" name="bmi" id="bmi" value="{{ bmi }}" required><br>
+
+            <label for="children">Children:</label>
+            <input type="number" name="children" id="children" value="{{ children }}" required><br>
+
+            <label for="smoker">Smoker:</label>
+            <select name="smoker" id="smoker" required>
+                <option value="no" {% if smoker == 'no' %}selected{% endif %}>No</option>
+                <option value="yes" {% if smoker == 'yes' %}selected{% endif %}>Yes</option>
+            </select><br>
+
+            <label for="sex">Sex:</label>
+            <select name="sex" id="sex" required>
+                <option value="female" {% if sex == 'female' %}selected{% endif %}>Female</option>
+                <option value="male" {% if sex == 'male' %}selected{% endif %}>Male</option>
+            </select><br>
+
+            <label for="region">Region:</label>
+            <select name="region" id="region" required>
+                <option value="southwest" {% if region == 'southwest' %}selected{% endif %}>Southwest</option>
+                <option value="southeast" {% if region == 'southeast' %}selected{% endif %}>Southeast</option>
+                <option value="northwest" {% if region == 'northwest' %}selected{% endif %}>Northwest</option>
+                <option value="northeast" {% if region == 'northeast' %}selected{% endif %}>Northeast</option>
+            </select><br>
+
+            <input type="submit" value="Predict">
+        </form>
+
+        {% if prediction_text %}
+        <h2>{{ prediction_text }}</h2>
+        {% endif %}
+
+        {% if confidence_text %}
+        <h3>{{ confidence_text }}</h3>
+        {% endif %}
+
+        <hr>
+
+        <h3>Usage History</h3>
+        {% if history %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Age</th>
+                    <th>BMI</th>
+                    <th>Children</th>
+                    <th>Smoker</th>
+                    <th>Sex</th>
+                    <th>Region</th>
+                    <th>Predicted Charge</th>
+                    <th>Confidence Interval</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in history %}
+                <tr>
+                    <td>{{ entry.model }}</td>
+                    <td>{{ entry.age }}</td>
+                    <td>{{ entry.bmi }}</td>
+                    <td>{{ entry.children }}</td>
+                    <td>{{ entry.smoker }}</td>
+                    <td>{{ entry.sex }}</td>
+                    <td>{{ entry.region }}</td>
+                    <td>{{ entry.predicted_charge }}</td>
+                    <td>{{ entry.confidence_interval }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No usage history available.</p>
+        {% endif %}
+
+        <!-- Nút để tải lịch sử dự đoán -->
+        <form action="/download_history" method="GET">
+            <button type="submit">Download Usage History</button>
+        </form>
+    </div>
+</body>
+</html>
